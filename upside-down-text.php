@@ -3,7 +3,7 @@
 Plugin Name: Upside Down Text
 Plugin URI: http://www.grenadepod.com/projects/upside-down-text-plugin-for-wordpress/
 Description: This plugin allows to "flip" any section of text upside down
-Version: 1.0.0
+Version: 1.1.0
 Author: Grenadepod
 Author URI: http://www.grenadepod.com
 */
@@ -34,6 +34,10 @@ if (!CUSTOM_TAGS) {
     $allowedtags['upsidedown'] = array();
 }
 
+// This function converts all characters in a string
+// to matching "upside-down" Unicode characters
+// Input is an array as suppplied by PHP preg_replace_callback function,
+// so if called directly it needs to receive array('', <your string to convert>)
 function convert_to_upsidedown_unicode($match)
 {
     // conversion table
@@ -143,8 +147,17 @@ function flip_text_upside_down_filter($content)
     );
 }
 
+// Shortcode function to parse [upsidedown] shortcodes
+function flip_text_upside_down_shortcode($atts, $content=null)
+{
+    return convert_to_upsidedown_unicode(array('', $content));
+}
+
 // And just add appropriate filters where we want to allow upside-down text:
 // post body, excerpt and comments
 add_filter('the_content', 'flip_text_upside_down_filter');
 add_filter('the_excerpt', 'flip_text_upside_down_filter');
 add_filter('comment_text', 'flip_text_upside_down_filter');
+
+// Also register shortcode handler
+add_shortcode('upsidedown', 'flip_text_upside_down_shortcode');
